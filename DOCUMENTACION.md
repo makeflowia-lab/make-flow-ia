@@ -684,4 +684,27 @@ Si la cámara falla pero el micrófono funciona (o viceversa), la sesión contin
 
 ---
 
-*Documentación generada durante el desarrollo — Make Flow IA v0.1.0*
+### P9 — Error de compilación: 'meetingTitle' no encontrado en MeetingControlBar
+
+**Síntoma:** El build de producción fallaba con error de tipos en `MeetingRoom.tsx` indicando que no se encontraba `meetingTitle` dentro del componente hijo.
+
+**Causa:** Se agregó el componente `InvitePanel` dentro de `MeetingControlBar` el cual requiere `meetingTitle`, pero este no se estaba pasando como prop desde el componente padre.
+
+**Solución:** Se actualizó la interfaz de props de `MeetingControlBar` para incluir `meetingTitle` y se propagó el valor desde `MeetingRoom`.
+
+---
+
+### P10 — Error de plataforma en Vercel (EBADPLATFORM)
+
+**Síntoma:** El despliegue en Vercel fallaba durante la instalación de dependencias con errores relacionados con `@tailwindcss/oxide-win32-x64-msvc`.
+
+**Causa:** El archivo `package.json` incluía dependencias nativas de Windows que son incompatibles con el entorno Linux de Vercel. Además, el `package-lock.json` generado en Windows forzaba versiones incompatibles.
+
+**Solución:** 
+1. Se eliminaron manualmente las referencias a binarios `-win32-` del `package.json`.
+2. Se añadió `package-lock.json` al `.gitignore` para permitir que Vercel genere su propio árbol de dependencias.
+3. Se forzó una limpia de caché local ejecutando `del package-lock.json && npm install`.
+
+---
+
+*Documentación actualizada tras el despliegue final — v0.1.1*

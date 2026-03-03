@@ -1,4 +1,5 @@
 # Guía de Solicitudes — Make Flow IA (Videollamadas con LiveKit)
+
 > Registro de solicitudes realizadas para construir y ajustar la plataforma.
 > Úsalo como guía para replicar el proceso con Claude Code.
 
@@ -37,6 +38,7 @@ la opcion de colocar su nombre
 ```
 puede hacer que funcione estas opciones
 ```
+
 > (Pantalla del menú con: Copiar enlace, Iniciar pizarra, Bloquear meeting,
 > Habilitar sesión de grupos, Informar problema, Opciones de Meeting, Salir)
 
@@ -117,6 +119,7 @@ que se puede romper el linx, algo twin algo no recuerdo el nombre
 ok arreglalos o ignoralos, porque visualmente molestan y quien abe de codigo
 pensara que no funciona
 ```
+
 > Errores: "Abort handler called" / "Received leave request while trying to reconnect"
 
 ---
@@ -181,6 +184,29 @@ quedo listo o no, dime que tanto haces, que falta preguntas y respuestas en espa
 
 ---
 
+## 20. Finalizar despliegue y solucionar problemas
+
+```
+terminada de hacer el deploy y solucionar cualquier problema
+```
+
+---
+
+## 21. Corrección de errores finales (Build & Types)
+
+1. **Error de tipos en MeetingRoom**: Se detectó que `meetingTitle` no se pasaba correctamente al componente hijo `MeetingControlBar`, rompiendo el build de producción.
+2. **Dependencias multiplataforma**: Eliminación de binarios nativos de Windows del `package.json` para asegurar compatibilidad con servidores Linux (Vercel).
+
+---
+
+## 22. Actualización de documentación final
+
+```
+ok actualiza el md donde te pido colocar todas la implementaciones o modificaciones finales, para que lo comparta
+```
+
+---
+
 ## Notas para la comunidad
 
 - El proyecto usa **Next.js 16 + LiveKit Cloud + Neon PostgreSQL + Tailwind CSS v4**
@@ -194,22 +220,27 @@ quedo listo o no, dime que tanto haces, que falta preguntas y respuestas en espa
 ## Preguntas Frecuentes (FAQ)
 
 ### ¿Por qué la videollamada se conecta y se desconecta en un bucle?
+
 Probablemente `reactStrictMode` está en `true`. En Next.js con LiveKit, el doble montaje de React causa errores de "trickle/offer before connected". Solución: en `next.config.ts` colocar `reactStrictMode: false`.
 
 ---
 
 ### ¿Por qué aparece el error "Tried to access LayoutContext outside a LayoutContextProvider"?
+
 El `ControlBar` de LiveKit necesita estar envuelto en un `<LayoutContextProvider>`. Asegurate de importarlo desde `@livekit/components-react` y envolver todos los hijos de `<LiveKitRoom>` con ese provider.
 
 ---
 
 ### ¿Por qué el chat no funciona o da error?
+
 Si usás el hook `useLayoutContext` directamente, puede fallar antes de que el provider esté listo. La solución es usar el hook `useChat` de `@livekit/components-react` y manejar el estado del chat en el componente padre (`MeetingRoom`), sin depender de `useLayoutContext`.
 
 ---
 
 ### ¿Por qué los nombres de los participantes no se ven?
+
 El nombre se toma del token de LiveKit. Si el usuario no tiene nombre registrado en la base de datos, el token lo manda vacío. Solución: en la ruta de token agregar un fallback:
+
 ```ts
 const participantName = user.name?.trim() || user.email.split("@")[0];
 ```
@@ -217,60 +248,84 @@ const participantName = user.name?.trim() || user.email.split("@")[0];
 ---
 
 ### ¿Por qué "levantar la mano" da error de permisos?
+
 LiveKit requiere el permiso `canUpdateOwnMetadata: true` en el token para que el participante pueda modificar sus propios atributos. Agregá ese campo en el `addGrant()` al generar el token.
 
 ---
 
 ### ¿Por qué "ocultar nombres" no funciona?
+
 La solución correcta es pasar un CSS custom property via `style` inline al contenedor del tile, y en `globals.css` usar el selector:
+
 ```css
 [style*="--lk-participant-name-display: none"] .lk-participant-name {
   display: none !important;
 }
 ```
+
 Luego, pasar la prop `hideNames` desde `MeetingRoom` hasta `VideoGrid` y aplicar ese estilo condicionalmente.
 
 ---
 
 ### ¿Por qué el build falla en Vercel con error EBADPLATFORM o @tailwindcss/oxide?
-Tailwind CSS v4 instala binarios nativos específicos para cada sistema operativo. Si generaste el `package-lock.json` en Windows, los binarios de Windows (`@tailwindcss/oxide-win32-x64-msvc`) no sirven en el servidor Linux de Vercel. Solución: eliminar `package-lock.json` del repositorio y dejar que Vercel lo genere al momento del deploy.
+
+Tailwind CSS v4 instala binarios nativos específicos para cada sistema operativo. Si generaste el `package-lock.json` en Windows, los binarios de Windows no sirven en Linux.
+
+**Solución definitiva:**
+
+1. Eliminar `@tailwindcss/oxide-win32-x64-msvc` y `lightningcss-win32-x64-msvc` de las dependencias en `package.json`.
+2. Eliminar `package-lock.json` y ejecutar `npm install` localmente.
+3. Asegurarse de que `package-lock.json` esté en `.gitignore` para que Vercel genere su propio árbol de dependencias optimizado para Linux.
 
 ---
 
 ### ¿Cómo hago que el panel de invitación envíe el correo con la información de la reunión?
+
 Usá el protocolo `mailto:` con el asunto y cuerpo pre-completados. Esto abre el cliente de correo del usuario con toda la información lista. Ejemplo:
+
 ```ts
 const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 window.open(mailtoLink, "_blank");
 ```
+
 Mostrá un mensaje de "Invitación enviada" con un `setTimeout` luego de abrir el link.
 
 ---
 
 ### ¿Cómo suprimir los errores de LiveKit en la consola del navegador?
+
 Sobreescribí `console.error` al montar el componente principal y restauralo al desmontar:
+
 ```ts
 useEffect(() => {
-  const SUPPRESSED = ["Abort handler called", "Received leave request while trying to"];
+  const SUPPRESSED = [
+    "Abort handler called",
+    "Received leave request while trying to",
+  ];
   const original = console.error.bind(console);
   console.error = (...args: unknown[]) => {
     const msg = args[0]?.toString() ?? "";
     if (SUPPRESSED.some((s) => msg.includes(s))) return;
     original(...args);
   };
-  return () => { console.error = original; };
+  return () => {
+    console.error = original;
+  };
 }, []);
 ```
 
 ---
 
 ### ¿Cómo evitar que el input del chat quede tapado por la barra de controles?
+
 Añadí `padding-bottom` al contenedor principal que tiene el video y el chat lateral. El valor depende de la altura de tu barra de controles — entre `pb-[72px]` y `pb-[80px]` suele funcionar con Tailwind CSS.
 
 ---
 
 ### ¿Cómo hacer que el textarea del chat crezca automáticamente con el contenido?
+
 En el evento `onChange` del textarea, reasigná la altura:
+
 ```tsx
 onChange={(e) => {
   setMessage(e.target.value);
@@ -278,7 +333,9 @@ onChange={(e) => {
   e.target.style.height = Math.min(e.target.scrollHeight, 96) + "px";
 }}
 ```
+
 Y para enviar con Enter pero insertar salto de línea con Shift+Enter:
+
 ```tsx
 onKeyDown={(e) => {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
@@ -288,6 +345,7 @@ onKeyDown={(e) => {
 ---
 
 ### ¿Cuáles son las variables de entorno necesarias para producción?
+
 ```
 DATABASE_URL=         # URL de conexión a Neon PostgreSQL
 JWT_SECRET=           # Clave secreta para firmar los tokens JWT
