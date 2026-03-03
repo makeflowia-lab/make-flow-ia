@@ -16,7 +16,9 @@
       "Bash(ls:*)",
       "Bash(cp:*)",
       "Bash(vercel:*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(source:*)"
     ]
   }
 }

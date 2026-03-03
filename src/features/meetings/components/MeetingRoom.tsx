@@ -38,13 +38,16 @@ function DesignPanel({
   layout,
   onLayoutChange,
   onClose,
+  hideNames,
+  setHideNames,
 }: {
   layout: LayoutMode;
   onLayoutChange: (l: LayoutMode) => void;
   onClose: () => void;
+  hideNames: boolean;
+  setHideNames: (v: boolean) => void;
 }) {
   const [fullscreen, setFullscreen] = useState(false);
-  const [hideNames, setHideNames] = useState(false);
 
   function toggleFullscreen() {
     if (!document.fullscreenElement) {
@@ -120,9 +123,10 @@ function DesignPanel({
 }
 
 // ─── Panel lateral - Invitar / Participantes ──────────────────────────────────
-function InvitePanel({ meetingId, onClose }: { meetingId: string; onClose: () => void }) {
-  const [search, setSearch] = useState("");
+function InvitePanel({ meetingId, meetingTitle, onClose }: { meetingId: string; meetingTitle: string; onClose: () => void }) {
+  const [email, setEmail] = useState("");
   const [copied, setCopied] = useState(false);
+  const [sent, setSent] = useState(false);
   const meetingUrl = typeof window !== "undefined"
     ? `${window.location.origin}/meetings/${meetingId}`
     : "";
@@ -133,6 +137,21 @@ function InvitePanel({ meetingId, onClose }: { meetingId: string; onClose: () =>
     setTimeout(() => setCopied(false), 2000);
   }
 
+  function sendInvite() {
+    if (!email.trim()) return;
+    const subject = encodeURIComponent(`Te invito a unirte a: ${meetingTitle}`);
+    const body = encodeURIComponent(
+      `Hola,\n\nTe invito a unirte a la reunión "${meetingTitle}" en Make Flow IA.\n\n` +
+      `📅 Únete ahora:\n${meetingUrl}\n\n` +
+      `O copia este enlace en tu navegador:\n${meetingUrl}\n\n` +
+      `Te esperamos.\n\nMake Flow IA`
+    );
+    window.open(`mailto:${email.trim()}?subject=${subject}&body=${body}`, "_blank");
+    setSent(true);
+    setEmail("");
+    setTimeout(() => setSent(false), 3000);
+  }
+
   return (
     <div className="w-80 bg-[#242424] border-l border-white/10 flex flex-col animate-slide-in">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
@@ -141,27 +160,36 @@ function InvitePanel({ meetingId, onClose }: { meetingId: string; onClose: () =>
           <X className="w-4 h-4" />
         </Button>
       </div>
-      <div className="flex gap-3 px-4 py-2 border-b border-white/10">
-        <button className="text-sm text-[#00a0d1] border-b-2 border-[#00a0d1] pb-1">Personas</button>
-        <button className="text-sm text-[#b3b3b3] hover:text-white pb-1">Dispositivos</button>
-      </div>
       <div className="p-4 space-y-3">
+        {sent && (
+          <div className="px-3 py-2 bg-green-500/15 border border-green-500/30 rounded-lg text-sm text-green-400">
+            ✓ Invitación enviada correctamente
+          </div>
+        )}
         <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Añadir por nombre o dirección de correo"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && sendInvite()}
+          placeholder="Correo electrónico"
+          type="email"
           className="w-full bg-[#2d2d2d] border border-white/10 rounded-lg text-white placeholder:text-[#6e6e6e] px-3 py-2 text-sm outline-none focus:border-[#00a0d1]"
         />
-        <Button variant="secondary" className="w-full" disabled={!search}>
+        <Button
+          variant="secondary"
+          className="w-full"
+          disabled={!email.trim()}
+          onClick={sendInvite}
+        >
           Invitar
         </Button>
-        <div className="pt-2 border-t border-white/10">
+        <div className="pt-2 border-t border-white/10 space-y-1">
+          <p className="text-xs text-[#6e6e6e] px-1">O comparte el enlace directamente:</p>
           <button
             onClick={copyLink}
             className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-white hover:bg-white/10 transition-colors"
           >
             <Copy className="w-4 h-4 text-[#6e6e6e]" />
-            {copied ? "¡Copiado!" : "Copiar enlace de meeting"}
+            {copied ? "¡Enlace copiado!" : "Copiar enlace de meeting"}
           </button>
         </div>
       </div>
@@ -381,6 +409,8 @@ function MeetingControlBar({
   setShowInvite,
   showChat,
   setShowChat,
+  hideNames,
+  setHideNames,
 }: {
   meetingId: string;
   onLeave: () => void;
@@ -392,6 +422,8 @@ function MeetingControlBar({
   setShowInvite: (v: boolean) => void;
   showChat: boolean;
   setShowChat: (v: boolean) => void;
+  hideNames: boolean;
+  setHideNames: (v: boolean) => void;
 }) {
   const [showMore, setShowMore] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
@@ -454,10 +486,12 @@ function MeetingControlBar({
             layout={layout}
             onLayoutChange={onLayoutChange}
             onClose={() => setShowDesign(false)}
+            hideNames={hideNames}
+            setHideNames={setHideNames}
           />
         )}
         {showInvite && (
-          <InvitePanel meetingId={meetingId} onClose={() => setShowInvite(false)} />
+          <InvitePanel meetingId={meetingId} meetingTitle={meetingTitle} onClose={() => setShowInvite(false)} />
         )}
       </div>
 
@@ -664,7 +698,7 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
 }
 
 // ─── Grid de video con soporte de layouts ─────────────────────────────────────
-function VideoGrid({ layout }: { layout: LayoutMode }) {
+function VideoGrid({ layout, hideNames }: { layout: LayoutMode; hideNames: boolean }) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: false },
@@ -673,10 +707,14 @@ function VideoGrid({ layout }: { layout: LayoutMode }) {
     { onlySubscribed: false }
   );
 
+  const nameStyle: React.CSSProperties = hideNames
+    ? { "--lk-participant-name-display": "none" } as React.CSSProperties
+    : {};
+
   if (layout === "grouped") {
     const [main, ...rest] = tracks;
     return (
-      <div style={{ display: "flex", height: "100%", gap: 8, padding: 8 }}>
+      <div style={{ display: "flex", height: "100%", gap: 8, padding: 8, ...nameStyle }}>
         <div style={{ flex: "0 0 70%", borderRadius: 8, overflow: "hidden", background: "#242424" }}>
           {main ? (
             <ParticipantTile
@@ -711,6 +749,7 @@ function VideoGrid({ layout }: { layout: LayoutMode }) {
           height: "100%",
           gap: 8,
           padding: 8,
+          ...nameStyle,
         }}
       >
         {tracks.map((t) => (
@@ -726,9 +765,11 @@ function VideoGrid({ layout }: { layout: LayoutMode }) {
 
   // Modo grid (default)
   return (
-    <GridLayout tracks={tracks} style={{ height: "100%", width: "100%" }}>
-      <ParticipantTile />
-    </GridLayout>
+    <div style={{ height: "100%", width: "100%", ...nameStyle }}>
+      <GridLayout tracks={tracks} style={{ height: "100%", width: "100%" }}>
+        <ParticipantTile />
+      </GridLayout>
+    </div>
   );
 }
 
@@ -746,6 +787,7 @@ export function MeetingRoom({
   const [showDesign, setShowDesign] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [hideNames, setHideNames] = useState(false);
 
   // Suprimir warnings internos de LiveKit que no afectan funcionalidad
   useEffect(() => {
@@ -831,7 +873,7 @@ export function MeetingRoom({
         {/* Área de video + panel de chat */}
         <div className="flex-1 pt-11 pb-[80px] flex overflow-hidden">
           <div className="flex-1 relative min-w-0">
-            <VideoGrid layout={layout} />
+            <VideoGrid layout={layout} hideNames={hideNames} />
           </div>
           {showChat && <ChatPanel onClose={() => setShowChat(false)} />}
         </div>
@@ -850,6 +892,8 @@ export function MeetingRoom({
           setShowInvite={setShowInvite}
           showChat={showChat}
           setShowChat={setShowChat}
+          hideNames={hideNames}
+          setHideNames={setHideNames}
         />
         </LayoutContextProvider>
       </LiveKitRoom>

@@ -25,6 +25,7 @@ export async function generateRoomToken(
     canPublish: true,
     canSubscribe: true,
     canPublishData: true,
+    canUpdateOwnMetadata: true,
     roomAdmin: isHost,
     roomRecord: isHost,
   });

@@ -78,6 +78,12 @@ body {
   overflow: hidden !important;
 }
 
+/* Ocultar nombres cuando hideNames está activo */
+[style*="--lk-participant-name-display: none"] .lk-participant-name,
+[style*="--lk-participant-name-display: none"] .lk-participant-metadata {
+  display: none !important;
+}
+
 .lk-grid-layout {
   gap: 8px !important;
   padding: 8px !important;
