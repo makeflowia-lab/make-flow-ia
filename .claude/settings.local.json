@@ -18,7 +18,15 @@
       "Bash(vercel:*)",
       "Bash(gh auth:*)",
       "Bash(gh repo:*)",
-      "Bash(source:*)"
+      "Bash(source:*)",
+      "Bash(__NEW_LINE_0c7d04091e6f20fd__ curl:*)",
+      "Bash(gh api:*)",
+      "Bash(__NEW_LINE_fa7ebd7837f2838a__ curl:*)",
+      "Bash(__NEW_LINE_dcb24c2b11b77cfe__ curl:*)",
+      "Bash(__NEW_LINE_c79184fe4f6cd924__ curl:*)",
+      "Bash(__NEW_LINE_9a12ab34051e3e83__ curl:*)",
+      "Bash(__NEW_LINE_35d80552fb51701d__ curl:*)",
+      "Bash(__NEW_LINE_e4e07110b03cbebe__ curl:*)"
     ]
   }
 }

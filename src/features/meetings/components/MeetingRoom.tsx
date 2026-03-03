@@ -17,9 +17,23 @@ import {
 } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import {
-  ChevronLeft, LayoutGrid, Info, Copy, Users,
-  Grid3x3, Rows3, Columns2, X, ToggleLeft, ToggleRight,
-  Pencil, Lock, Unlock, MessageSquareWarning, Settings2, LogOut
+  ChevronLeft,
+  LayoutGrid,
+  Info,
+  Copy,
+  Users,
+  Grid3x3,
+  Rows3,
+  Columns2,
+  X,
+  ToggleLeft,
+  ToggleRight,
+  Pencil,
+  Lock,
+  Unlock,
+  MessageSquareWarning,
+  Settings2,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/Button";
 import type { LayoutMode } from "../types";
@@ -62,7 +76,11 @@ function DesignPanel({
   const layouts: { id: LayoutMode; icon: React.ReactNode; label: string }[] = [
     { id: "grid", icon: <Grid3x3 className="w-5 h-5" />, label: "Cuadrícula" },
     { id: "grouped", icon: <Rows3 className="w-5 h-5" />, label: "Agrupado" },
-    { id: "side-by-side", icon: <Columns2 className="w-5 h-5" />, label: "Uno junto a otro" },
+    {
+      id: "side-by-side",
+      icon: <Columns2 className="w-5 h-5" />,
+      label: "Uno junto a otro",
+    },
   ];
 
   return (
@@ -86,7 +104,9 @@ function DesignPanel({
               }`}
             >
               {l.icon}
-              <span className="text-xs text-center leading-tight">{l.label}</span>
+              <span className="text-xs text-center leading-tight">
+                {l.label}
+              </span>
             </button>
           ))}
         </div>
@@ -98,7 +118,9 @@ function DesignPanel({
             className="flex items-center justify-between py-2 cursor-pointer"
             onClick={toggleFullscreen}
           >
-            <span className="text-sm text-white">Vista de pantalla completa</span>
+            <span className="text-sm text-white">
+              Vista de pantalla completa
+            </span>
             {fullscreen ? (
               <ToggleRight className="w-8 h-8 text-[#00a0d1]" />
             ) : (
@@ -109,7 +131,9 @@ function DesignPanel({
             className="flex items-center justify-between py-2 cursor-pointer"
             onClick={() => setHideNames(!hideNames)}
           >
-            <span className="text-sm text-white">Ocultar nombres automáticamente</span>
+            <span className="text-sm text-white">
+              Ocultar nombres automáticamente
+            </span>
             {hideNames ? (
               <ToggleRight className="w-8 h-8 text-[#00a0d1]" />
             ) : (
@@ -123,13 +147,22 @@ function DesignPanel({
 }
 
 // ─── Panel lateral - Invitar / Participantes ──────────────────────────────────
-function InvitePanel({ meetingId, meetingTitle, onClose }: { meetingId: string; meetingTitle: string; onClose: () => void }) {
+function InvitePanel({
+  meetingId,
+  meetingTitle,
+  onClose,
+}: {
+  meetingId: string;
+  meetingTitle: string;
+  onClose: () => void;
+}) {
   const [email, setEmail] = useState("");
   const [copied, setCopied] = useState(false);
   const [sent, setSent] = useState(false);
-  const meetingUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/meetings/${meetingId}`
-    : "";
+  const meetingUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/meetings/${meetingId}`
+      : "";
 
   function copyLink() {
     navigator.clipboard.writeText(meetingUrl);
@@ -142,11 +175,14 @@ function InvitePanel({ meetingId, meetingTitle, onClose }: { meetingId: string; 
     const subject = encodeURIComponent(`Te invito a unirte a: ${meetingTitle}`);
     const body = encodeURIComponent(
       `Hola,\n\nTe invito a unirte a la reunión "${meetingTitle}" en Make Flow IA.\n\n` +
-      `📅 Únete ahora:\n${meetingUrl}\n\n` +
-      `O copia este enlace en tu navegador:\n${meetingUrl}\n\n` +
-      `Te esperamos.\n\nMake Flow IA`
+        `📅 Únete ahora:\n${meetingUrl}\n\n` +
+        `O copia este enlace en tu navegador:\n${meetingUrl}\n\n` +
+        `Te esperamos.\n\nMake Flow IA`,
     );
-    window.open(`mailto:${email.trim()}?subject=${subject}&body=${body}`, "_blank");
+    window.open(
+      `mailto:${email.trim()}?subject=${subject}&body=${body}`,
+      "_blank",
+    );
     setSent(true);
     setEmail("");
     setTimeout(() => setSent(false), 3000);
@@ -155,7 +191,9 @@ function InvitePanel({ meetingId, meetingTitle, onClose }: { meetingId: string; 
   return (
     <div className="w-80 bg-[#242424] border-l border-white/10 flex flex-col animate-slide-in">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
-        <span className="text-sm font-semibold text-white flex-1">Invitar a personas</span>
+        <span className="text-sm font-semibold text-white flex-1">
+          Invitar a personas
+        </span>
         <Button variant="ghost" size="sm" onClick={onClose} className="!p-1">
           <X className="w-4 h-4" />
         </Button>
@@ -183,7 +221,9 @@ function InvitePanel({ meetingId, meetingTitle, onClose }: { meetingId: string; 
           Invitar
         </Button>
         <div className="pt-2 border-t border-white/10 space-y-1">
-          <p className="text-xs text-[#6e6e6e] px-1">O comparte el enlace directamente:</p>
+          <p className="text-xs text-[#6e6e6e] px-1">
+            O comparte el enlace directamente:
+          </p>
           <button
             onClick={copyLink}
             className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-white hover:bg-white/10 transition-colors"
@@ -223,7 +263,9 @@ function MoreOptionsMenu({
   }
 
   function openWhiteboard() {
-    const key = btoa(meetingId).replace(/[^a-z0-9]/gi, "").slice(0, 20);
+    const key = btoa(meetingId)
+      .replace(/[^a-z0-9]/gi, "")
+      .slice(0, 20);
     window.open(`https://excalidraw.com/#room=${meetingId},${key}`, "_blank");
     onClose();
   }
@@ -231,19 +273,32 @@ function MoreOptionsMenu({
   function toggleLock() {
     const next = !locked;
     setLocked(next);
-    showNotice(next ? "Meeting bloqueado — nuevos participantes no pueden unirse" : "Meeting desbloqueado");
+    showNotice(
+      next
+        ? "Meeting bloqueado — nuevos participantes no pueden unirse"
+        : "Meeting desbloqueado",
+    );
   }
 
   function toggleBreakrooms() {
     const next = !breakrooms;
     setBreakrooms(next);
-    showNotice(next ? "Sesiones de grupos habilitadas" : "Sesiones de grupos deshabilitadas");
+    showNotice(
+      next
+        ? "Sesiones de grupos habilitadas"
+        : "Sesiones de grupos deshabilitadas",
+    );
   }
 
   function reportProblem() {
     const subject = encodeURIComponent(`Problema en reunión ${meetingId}`);
-    const body = encodeURIComponent(`Hola, encontré un problema en la reunión ${meetingId}.\n\nDescripción:\n`);
-    window.open(`mailto:soporte@makeflowia.com?subject=${subject}&body=${body}`, "_blank");
+    const body = encodeURIComponent(
+      `Hola, encontré un problema en la reunión ${meetingId}.\n\nDescripción:\n`,
+    );
+    window.open(
+      `mailto:soporte@makeflowia.com?subject=${subject}&body=${body}`,
+      "_blank",
+    );
     onClose();
   }
 
@@ -255,7 +310,9 @@ function MoreOptionsMenu({
   return (
     <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-50 bg-[#2d2d2d] border border-white/10 rounded-xl shadow-2xl w-64 py-1 animate-fade-in">
       <div className="px-3 py-1.5">
-        <p className="text-xs font-semibold text-[#6e6e6e] uppercase tracking-wider">meeting</p>
+        <p className="text-xs font-semibold text-[#6e6e6e] uppercase tracking-wider">
+          meeting
+        </p>
       </div>
 
       {notice && (
@@ -282,10 +339,18 @@ function MoreOptionsMenu({
         onClick={toggleLock}
         className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-white hover:bg-white/10 transition-colors"
       >
-        {locked ? <Lock className="w-4 h-4 text-[#6e6e6e]" /> : <Unlock className="w-4 h-4 text-[#6e6e6e]" />}
+        {locked ? (
+          <Lock className="w-4 h-4 text-[#6e6e6e]" />
+        ) : (
+          <Unlock className="w-4 h-4 text-[#6e6e6e]" />
+        )}
         <span className="flex-1 text-left">Bloquear meeting</span>
-        <div className={`w-7 h-4 rounded-full transition-colors ${locked ? "bg-[#00a0d1]" : "bg-[#6e6e6e]"}`}>
-          <div className={`w-3 h-3 bg-white rounded-full mt-0.5 transition-transform ${locked ? "translate-x-3.5" : "translate-x-0.5"}`} />
+        <div
+          className={`w-7 h-4 rounded-full transition-colors ${locked ? "bg-[#00a0d1]" : "bg-[#6e6e6e]"}`}
+        >
+          <div
+            className={`w-3 h-3 bg-white rounded-full mt-0.5 transition-transform ${locked ? "translate-x-3.5" : "translate-x-0.5"}`}
+          />
         </div>
       </button>
       <button
@@ -294,8 +359,12 @@ function MoreOptionsMenu({
       >
         <Users className="w-4 h-4 text-[#6e6e6e]" />
         <span className="flex-1 text-left">Habilitar sesión de grupos</span>
-        <div className={`w-7 h-4 rounded-full transition-colors ${breakrooms ? "bg-[#00a0d1]" : "bg-[#6e6e6e]"}`}>
-          <div className={`w-3 h-3 bg-white rounded-full mt-0.5 transition-transform ${breakrooms ? "translate-x-3.5" : "translate-x-0.5"}`} />
+        <div
+          className={`w-7 h-4 rounded-full transition-colors ${breakrooms ? "bg-[#00a0d1]" : "bg-[#6e6e6e]"}`}
+        >
+          <div
+            className={`w-3 h-3 bg-white rounded-full mt-0.5 transition-transform ${breakrooms ? "translate-x-3.5" : "translate-x-0.5"}`}
+          />
         </div>
       </button>
       <button
@@ -351,7 +420,9 @@ function FloatingEmojiLayer({ emojis }: { emojis: ActiveEmoji[] }) {
 // ─── Notificaciones de mano levantada ─────────────────────────────────────────
 function HandRaisedOverlay() {
   const participants = useParticipants();
-  const raised = participants.filter((p) => p.attributes?.handRaised === "true");
+  const raised = participants.filter(
+    (p) => p.attributes?.handRaised === "true",
+  );
 
   if (raised.length === 0) return null;
 
@@ -387,7 +458,10 @@ function ReactionsBar({
       {REACTIONS.map((emoji) => (
         <button
           key={emoji}
-          onClick={() => { onSend(emoji); onClose(); }}
+          onClick={() => {
+            onSend(emoji);
+            onClose();
+          }}
           className="text-2xl p-1.5 rounded-xl hover:bg-white/10 transition-all hover:scale-125"
         >
           {emoji}
@@ -400,6 +474,7 @@ function ReactionsBar({
 // ─── Barra de controles ───────────────────────────────────────────────────────
 function MeetingControlBar({
   meetingId,
+  meetingTitle,
   onLeave,
   layout,
   onLayoutChange,
@@ -413,6 +488,7 @@ function MeetingControlBar({
   setHideNames,
 }: {
   meetingId: string;
+  meetingTitle: string;
   onLeave: () => void;
   layout: LayoutMode;
   onLayoutChange: (l: LayoutMode) => void;
@@ -448,13 +524,15 @@ function MeetingControlBar({
     setFloatingEmojis((prev) => [...prev, { id, emoji, x }]);
     setTimeout(
       () => setFloatingEmojis((prev) => prev.filter((e) => e.id !== id)),
-      2400
+      2400,
     );
   }
 
   function sendReaction(emoji: string) {
     try {
-      send(new TextEncoder().encode(JSON.stringify({ emoji })), { reliable: false });
+      send(new TextEncoder().encode(JSON.stringify({ emoji })), {
+        reliable: false,
+      });
     } catch {
       // sin conexión aún, ignorar
     }
@@ -491,7 +569,11 @@ function MeetingControlBar({
           />
         )}
         {showInvite && (
-          <InvitePanel meetingId={meetingId} meetingTitle={meetingTitle} onClose={() => setShowInvite(false)} />
+          <InvitePanel
+            meetingId={meetingId}
+            meetingTitle={meetingTitle}
+            onClose={() => setShowInvite(false)}
+          />
         )}
       </div>
 
@@ -515,7 +597,9 @@ function MeetingControlBar({
       {/* Barra de subtítulos */}
       {showSubtitles && (
         <div className="absolute bottom-16 left-4 z-40 bg-[#242424] border border-white/10 rounded-xl p-3 flex items-center gap-3 animate-fade-in">
-          <span className="text-sm text-white">Subtitulado en tiempo real no disponible</span>
+          <span className="text-sm text-white">
+            Subtitulado en tiempo real no disponible
+          </span>
           <button onClick={() => setShowSubtitles(false)}>
             <X className="w-4 h-4 text-[#6e6e6e]" />
           </button>
@@ -548,7 +632,11 @@ function MeetingControlBar({
           />
           {/* Chat */}
           <button
-            onClick={() => { setShowChat(!showChat); setShowMore(false); setShowReactions(false); }}
+            onClick={() => {
+              setShowChat(!showChat);
+              setShowMore(false);
+              setShowReactions(false);
+            }}
             title="Chat"
             className={`px-2 py-1.5 rounded-lg border text-base transition-all ${
               showChat
@@ -572,7 +660,10 @@ function MeetingControlBar({
           </button>
           {/* Reacciones */}
           <button
-            onClick={() => { setShowReactions(!showReactions); setShowMore(false); }}
+            onClick={() => {
+              setShowReactions(!showReactions);
+              setShowMore(false);
+            }}
             title="Reacciones"
             className="px-2 py-1.5 rounded-lg bg-[#2d2d2d] hover:bg-[#383838] text-white border border-white/10 text-base"
           >
@@ -580,7 +671,10 @@ function MeetingControlBar({
           </button>
           {/* Más opciones */}
           <button
-            onClick={() => { setShowMore(!showMore); setShowReactions(false); }}
+            onClick={() => {
+              setShowMore(!showMore);
+              setShowReactions(false);
+            }}
             title="Más opciones"
             className="px-2 py-1.5 rounded-lg bg-[#2d2d2d] hover:bg-[#383838] text-[#b3b3b3] border border-white/10"
           >
@@ -599,25 +693,38 @@ function MeetingControlBar({
         {/* Derecha */}
         <div className="flex items-center gap-1">
           <button
-            onClick={() => { setShowDesign(!showDesign); setShowInvite(false); }}
+            onClick={() => {
+              setShowDesign(!showDesign);
+              setShowInvite(false);
+            }}
             title="Diseño"
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-              showDesign ? "bg-white/20 text-white" : "hover:bg-white/10 text-[#b3b3b3]"
+              showDesign
+                ? "bg-white/20 text-white"
+                : "hover:bg-white/10 text-[#b3b3b3]"
             }`}
           >
             <Grid3x3 className="w-4 h-4" />
           </button>
           <button
-            onClick={() => { setShowInvite(!showInvite); setShowDesign(false); }}
+            onClick={() => {
+              setShowInvite(!showInvite);
+              setShowDesign(false);
+            }}
             title="Participantes"
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-              showInvite ? "bg-white/20 text-white" : "hover:bg-white/10 text-[#b3b3b3]"
+              showInvite
+                ? "bg-white/20 text-white"
+                : "hover:bg-white/10 text-[#b3b3b3]"
             }`}
           >
             <Users className="w-4 h-4" />
           </button>
           <button
-            onClick={() => { setShowInvite(!showInvite); setShowDesign(false); }}
+            onClick={() => {
+              setShowInvite(!showInvite);
+              setShowDesign(false);
+            }}
             title="Invitar"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs hover:bg-white/10 text-[#b3b3b3] transition-colors"
           >
@@ -649,7 +756,10 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
     <div className="w-72 bg-[#1e1e1e] border-l border-white/10 flex flex-col shrink-0">
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <span className="text-sm font-semibold text-white">Chat</span>
-        <button onClick={onClose} className="p-1 rounded hover:bg-white/10 text-[#b3b3b3] transition-colors">
+        <button
+          onClick={onClose}
+          className="p-1 rounded hover:bg-white/10 text-[#b3b3b3] transition-colors"
+        >
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -679,7 +789,12 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
             e.target.style.height = "auto";
             e.target.style.height = Math.min(e.target.scrollHeight, 96) + "px";
           }}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           placeholder="Escribe un mensaje…"
           rows={1}
           className="flex-1 bg-[#2d2d2d] border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder:text-[#6e6e6e] outline-none focus:border-[#00a0d1] min-w-0 resize-none overflow-y-auto leading-5"
@@ -698,36 +813,74 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
 }
 
 // ─── Grid de video con soporte de layouts ─────────────────────────────────────
-function VideoGrid({ layout, hideNames }: { layout: LayoutMode; hideNames: boolean }) {
+function VideoGrid({
+  layout,
+  hideNames,
+}: {
+  layout: LayoutMode;
+  hideNames: boolean;
+}) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: false },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
-    { onlySubscribed: false }
+    { onlySubscribed: false },
   );
 
   const nameStyle: React.CSSProperties = hideNames
-    ? { "--lk-participant-name-display": "none" } as React.CSSProperties
+    ? ({ "--lk-participant-name-display": "none" } as React.CSSProperties)
     : {};
 
   if (layout === "grouped") {
     const [main, ...rest] = tracks;
     return (
-      <div style={{ display: "flex", height: "100%", gap: 8, padding: 8, ...nameStyle }}>
-        <div style={{ flex: "0 0 70%", borderRadius: 8, overflow: "hidden", background: "#242424" }}>
+      <div
+        style={{
+          display: "flex",
+          height: "100%",
+          gap: 8,
+          padding: 8,
+          ...nameStyle,
+        }}
+      >
+        <div
+          style={{
+            flex: "0 0 70%",
+            borderRadius: 8,
+            overflow: "hidden",
+            background: "#242424",
+          }}
+        >
           {main ? (
             <ParticipantTile
               trackRef={main}
               style={{ height: "100%", width: "100%" }}
             />
           ) : (
-            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "#6e6e6e", fontSize: 14 }}>Esperando participantes…</span>
+            <div
+              style={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span style={{ color: "#6e6e6e", fontSize: 14 }}>
+                Esperando participantes…
+              </span>
             </div>
           )}
         </div>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8, overflowY: "auto" }}>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            overflowY: "auto",
+          }}
+        >
           {rest.map((t) => (
             <ParticipantTile
               key={`${t.participant.sid}-${t.source}`}
@@ -791,14 +944,19 @@ export function MeetingRoom({
 
   // Suprimir warnings internos de LiveKit que no afectan funcionalidad
   useEffect(() => {
-    const SUPPRESSED = ["Abort handler called", "Received leave request while trying to"];
+    const SUPPRESSED = [
+      "Abort handler called",
+      "Received leave request while trying to",
+    ];
     const original = console.error.bind(console);
     console.error = (...args: unknown[]) => {
       const msg = args[0]?.toString() ?? "";
       if (SUPPRESSED.some((s) => msg.includes(s))) return;
       original(...args);
     };
-    return () => { console.error = original; };
+    return () => {
+      console.error = original;
+    };
   }, []);
 
   const handleDisconnect = useCallback(() => {
@@ -824,77 +982,84 @@ export function MeetingRoom({
         options={{ adaptiveStream: true, dynacast: true }}
       >
         <LayoutContextProvider>
-        {/* Top bar */}
-        <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-2.5 bg-[#1a1a1a]/80 border-b border-white/10 backdrop-blur-sm">
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="flex items-center gap-1 text-sm text-[#b3b3b3] hover:text-white transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Atrás
-          </button>
-
-          <span className="text-sm font-medium text-white absolute left-1/2 -translate-x-1/2">
-            {meetingTitle}
-          </span>
-
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => { setShowDesign(!showDesign); setShowInvite(false); }}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${showDesign ? "bg-white/20 text-white" : "hover:bg-white/10 text-[#b3b3b3]"}`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-              Diseño
-            </button>
-            <button
-              onClick={() => { setShowInvite(!showInvite); setShowDesign(false); }}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${showInvite ? "bg-white/20 text-white" : "hover:bg-white/10 text-[#b3b3b3]"}`}
-            >
-              <Info className="w-4 h-4" />
-              Información
-            </button>
-            <button
-              onClick={copyMeetingLink}
-              title="Copiar enlace"
-              className="p-1.5 rounded hover:bg-white/10 text-[#b3b3b3] transition-colors"
-            >
-              <Copy className="w-4 h-4" />
-            </button>
+          {/* Top bar */}
+          <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-2.5 bg-[#1a1a1a]/80 border-b border-white/10 backdrop-blur-sm">
             <button
               onClick={() => router.push("/dashboard")}
-              title="Cerrar"
-              className="p-1.5 rounded hover:bg-white/10 text-[#b3b3b3] transition-colors"
+              className="flex items-center gap-1 text-sm text-[#b3b3b3] hover:text-white transition-colors"
             >
-              <X className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" />
+              Atrás
             </button>
+
+            <span className="text-sm font-medium text-white absolute left-1/2 -translate-x-1/2">
+              {meetingTitle}
+            </span>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => {
+                  setShowDesign(!showDesign);
+                  setShowInvite(false);
+                }}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${showDesign ? "bg-white/20 text-white" : "hover:bg-white/10 text-[#b3b3b3]"}`}
+              >
+                <LayoutGrid className="w-4 h-4" />
+                Diseño
+              </button>
+              <button
+                onClick={() => {
+                  setShowInvite(!showInvite);
+                  setShowDesign(false);
+                }}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${showInvite ? "bg-white/20 text-white" : "hover:bg-white/10 text-[#b3b3b3]"}`}
+              >
+                <Info className="w-4 h-4" />
+                Información
+              </button>
+              <button
+                onClick={copyMeetingLink}
+                title="Copiar enlace"
+                className="p-1.5 rounded hover:bg-white/10 text-[#b3b3b3] transition-colors"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => router.push("/dashboard")}
+                title="Cerrar"
+                className="p-1.5 rounded hover:bg-white/10 text-[#b3b3b3] transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Área de video + panel de chat */}
-        <div className="flex-1 pt-11 pb-[80px] flex overflow-hidden">
-          <div className="flex-1 relative min-w-0">
-            <VideoGrid layout={layout} hideNames={hideNames} />
+          {/* Área de video + panel de chat */}
+          <div className="flex-1 pt-11 pb-[80px] flex overflow-hidden">
+            <div className="flex-1 relative min-w-0">
+              <VideoGrid layout={layout} hideNames={hideNames} />
+            </div>
+            {showChat && <ChatPanel onClose={() => setShowChat(false)} />}
           </div>
-          {showChat && <ChatPanel onClose={() => setShowChat(false)} />}
-        </div>
 
-        <RoomAudioRenderer />
+          <RoomAudioRenderer />
 
-        {/* Barra de controles custom */}
-        <MeetingControlBar
-          meetingId={meetingId}
-          onLeave={handleDisconnect}
-          layout={layout}
-          onLayoutChange={setLayout}
-          showDesign={showDesign}
-          setShowDesign={setShowDesign}
-          showInvite={showInvite}
-          setShowInvite={setShowInvite}
-          showChat={showChat}
-          setShowChat={setShowChat}
-          hideNames={hideNames}
-          setHideNames={setHideNames}
-        />
+          {/* Barra de controles custom */}
+          <MeetingControlBar
+            meetingId={meetingId}
+            meetingTitle={meetingTitle}
+            onLeave={handleDisconnect}
+            layout={layout}
+            onLayoutChange={setLayout}
+            showDesign={showDesign}
+            setShowDesign={setShowDesign}
+            showInvite={showInvite}
+            setShowInvite={setShowInvite}
+            showChat={showChat}
+            setShowChat={setShowChat}
+            hideNames={hideNames}
+            setHideNames={setHideNames}
+          />
         </LayoutContextProvider>
       </LiveKitRoom>
     </div>
