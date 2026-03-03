@@ -130,10 +130,18 @@ export function PreJoinLobby({ meetingTitle, onJoin, onBack }: PreJoinLobbyProps
   }
 
   function handleJoin() {
-    // Detener tracks aquí para liberar la cámara antes de que LiveKit la solicite
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-    onJoin(!isMuted, !isVideoOff);
+    // Detener tracks aquí de forma más agresiva para liberar la cámara antes de que LiveKit la solicite
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => {
+        t.enabled = false;
+        t.stop();
+      });
+      streamRef.current = null;
+    }
+    // Pequeño retardo para asegurar que el SO libere el dispositivo (especialmente en Windows)
+    setTimeout(() => {
+      onJoin(!isMuted, !isVideoOff);
+    }, 300);
   }
 
   return (
@@ -190,6 +198,7 @@ export function PreJoinLobby({ meetingTitle, onJoin, onBack }: PreJoinLobbyProps
               </Button>
               <button
                 onClick={() => { setShowMicMenu(!showMicMenu); setShowCamMenu(false); }}
+                title="Opciones de micrófono"
                 className="px-2 py-2 bg-[#2d2d2d] hover:bg-[#383838] text-[#b3b3b3] border-l border-white/10"
               >
                 <ChevronDown className="w-4 h-4" />
@@ -228,6 +237,7 @@ export function PreJoinLobby({ meetingTitle, onJoin, onBack }: PreJoinLobbyProps
               </Button>
               <button
                 onClick={() => { setShowCamMenu(!showCamMenu); setShowMicMenu(false); }}
+                title="Opciones de cámara"
                 className="px-2 py-2 bg-[#2d2d2d] hover:bg-[#383838] text-[#b3b3b3] border-l border-white/10"
               >
                 <ChevronDown className="w-4 h-4" />

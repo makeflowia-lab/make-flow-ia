@@ -867,7 +867,7 @@ function VideoGrid({
 }) {
   const tracks = useTracks(
     [
-      { source: Track.Source.Camera, withPlaceholder: false },
+      { source: Track.Source.Camera, withPlaceholder: true },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
     { onlySubscribed: false },
@@ -1017,10 +1017,12 @@ export function MeetingRoom({
   return (
     <div className="h-screen w-screen bg-[#1a1a1a] flex flex-col overflow-hidden">
       <LiveKitRoom
+        key={token}
         video={videoEnabled}
         audio={audioEnabled}
         token={token}
         serverUrl={serverUrl}
+        connect={true}
         onDisconnected={handleDisconnect}
         data-lk-theme="default"
         className="flex-1 flex flex-col relative"
