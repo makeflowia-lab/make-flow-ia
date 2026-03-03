@@ -4,14 +4,17 @@ export async function generateRoomToken(
   roomName: string,
   participantIdentity: string,
   participantName: string,
-  isHost: boolean
+  isHost: boolean,
+  apiKey: string,
+  apiSecret: string
 ): Promise<string> {
-  const apiKey = process.env.LIVEKIT_API_KEY;
-  const apiSecret = process.env.LIVEKIT_API_SECRET;
-
   if (!apiKey || !apiSecret) {
+    console.error("LiveKit Config Missing:", { hasKey: !!apiKey, hasSecret: !!apiSecret });
     throw new Error("LIVEKIT_API_KEY and LIVEKIT_API_SECRET are required");
   }
+
+  console.log("Generating Token with Key:", apiKey.substring(0, 5) + "...");
+  console.log("Secret Length:", apiSecret.length);
 
   const at = new AccessToken(apiKey, apiSecret, {
     identity: participantIdentity,

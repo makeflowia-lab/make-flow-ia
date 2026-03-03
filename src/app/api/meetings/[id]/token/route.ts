@@ -13,6 +13,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const user = await verifyToken(authToken);
     const { id } = await params;
 
+    const apiKey = (process.env.LIVEKIT_API_KEY || "").trim();
+    const apiSecret = (process.env.LIVEKIT_API_SECRET || "").trim();
+
+    console.log("Token API: Generating for meeting", id);
+    console.log("Token API: API Key being used:", apiKey.substring(0, 5) + "...");
+    console.log("Token API: LIVEKIT_API_SECRET length:", process.env.LIVEKIT_API_SECRET?.length);
+    console.log("Token API: LIVEKIT_URL:", process.env.NEXT_PUBLIC_LIVEKIT_URL);
+
     const meetings = await sql`
       SELECT id, title, room_name, host_id, status, max_participants FROM meetings WHERE id = ${id} LIMIT 1
     `;
@@ -47,12 +55,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     // Generate LiveKit token — fallback name if missing
     const participantName = user.name?.trim() || user.email.split("@")[0];
+    console.log("Token API: Identity:", user.sub, "Room:", meeting.room_name);
+    console.log("Token API: Participant Name:", participantName);
+    console.log("Token API: isHost:", isHost);
+
     const livekitToken = await generateRoomToken(
       meeting.room_name,
       user.sub,
       participantName,
-      isHost
+      isHost,
+      apiKey,
+      apiSecret
     );
+
+    console.log("Token API: Token generated successfully. Length:", livekitToken.length);
+    console.log("Token API: Token starts with:", livekitToken.substring(0, 20));
 
     return NextResponse.json({
       data: {

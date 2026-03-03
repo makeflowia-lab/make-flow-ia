@@ -26,6 +26,10 @@ export default function MeetingPage() {
   const [mediaState, setMediaState] = useState({ video: true, audio: true });
 
   useEffect(() => {
+    console.log("MeetingPage: Mounted with ID", meetingId);
+  }, [meetingId]);
+
+  useEffect(() => {
     async function loadMeeting() {
       try {
         const res = await fetch(`/api/meetings/${meetingId}`);
@@ -46,24 +50,32 @@ export default function MeetingPage() {
   }, [meetingId]);
 
   async function handleJoin(audioEnabled: boolean, videoEnabled: boolean) {
+    console.log("MeetingPage: handleJoin called", { audioEnabled, videoEnabled });
     try {
       // Guardar preferencias del lobby
       setMediaState({ video: videoEnabled, audio: audioEnabled });
 
-      const res = await fetch(`/api/meetings/${meetingId}/token`, { method: "POST" });
+      console.log("MeetingPage: Fetching token...");
+      const res = await fetch(`/api/meetings/${meetingId}/token`, {
+        method: "POST",
+      });
       if (!res.ok) {
         const data = await res.json();
+        console.error("MeetingPage: Token fetch failed", data);
         setError(data.error || "Error obteniendo token");
         setStage("error");
         return;
       }
       const data = await res.json();
+      console.log("MeetingPage: Token received", data.data);
       setCredentials({
         token: data.data.token,
         serverUrl: data.data.serverUrl,
       });
+      console.log("MeetingPage: Switching to stage 'room'");
       setStage("room");
-    } catch {
+    } catch (err) {
+      console.error("MeetingPage: handleJoin error", err);
       setError("Error conectando a la sala");
       setStage("error");
     }
@@ -102,13 +114,23 @@ export default function MeetingPage() {
       <PreJoinLobby
         meetingTitle={meeting.title}
         onJoin={handleJoin}
-        onBack={() => router.push("/dashboard")}
+        onBack={() => {
+          console.log("MeetingPage: onBack called (redirecting to dashboard)");
+          router.push("/dashboard");
+        }}
       />
     );
   }
 
   if (stage === "room" && credentials && meeting) {
-    const serverUrl = credentials.serverUrl || process.env.NEXT_PUBLIC_LIVEKIT_URL || "";
+    console.log("MeetingPage: Rendering MeetingRoom stage");
+    const serverUrl =
+      credentials.serverUrl || process.env.NEXT_PUBLIC_LIVEKIT_URL || "";
+    console.log("MeetingPage: room details", {
+      serverUrl,
+      meetingId,
+      video: mediaState.video,
+    });
     return (
       <MeetingRoom
         token={credentials.token}
