@@ -43,6 +43,10 @@ import {
   ChevronDown,
   Monitor,
   MonitorOff,
+  MessageSquare,
+  Hand,
+  Smile,
+  MoreHorizontal,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/Button";
 import type { LayoutMode } from "../types";
@@ -617,161 +621,136 @@ function MeetingControlBar({
 
       {/* Barra de control inferior */}
       <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-2.5 bg-[#1a1a1a]/95 border-t border-white/10 backdrop-blur-sm z-10">
-        {/* Izquierda */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setShowSubtitles(!showSubtitles)}
-            title="Subtítulos"
-            className="px-2 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-[#b3b3b3]"
-          >
-            <span className="text-lg">💬</span>
-          </button>
+      {/* Barra de control inferior */}
+      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-[#1a1a1a]/95 border-t border-white/10 backdrop-blur-md z-10">
+        {/* Izquierda: Info de la Reunión */}
+        <div className="flex items-center gap-4">
+          <div className="hidden lg:flex flex-col">
+            <span className="text-xs text-[#6e6e6e] font-medium uppercase tracking-widest">En directo</span>
+            <span className="text-sm font-semibold text-white">{meetingTitle}</span>
+          </div>
         </div>
 
-        {/* Centro (Controles Principales) */}
-        <div className="flex items-center gap-2">
+        {/* Centro: Controles Principales Simplificados */}
+        <div className="flex items-center gap-3">
           {/* Micrófono */}
-          <div className="flex items-center rounded-lg bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-sm shadow-black/20">
-            <TrackToggle
-              source={Track.Source.Microphone}
-              className="px-3 py-1.5 flex items-center justify-center hover:bg-white/10 transition-colors border-r border-white/10 text-white data-[lk-enabled=false]:text-[#e74c3c]"
+          <div className="flex items-center rounded-xl bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-lg">
+            <button
+              onClick={() => localParticipant.setMicrophoneEnabled(!localParticipant.isMicrophoneEnabled)}
+              title={localParticipant.isMicrophoneEnabled ? "Silenciar" : "Activar micrófono"}
+              className={`px-4 py-2 flex items-center justify-center hover:bg-white/10 transition-all border-r border-white/10 ${
+                !localParticipant.isMicrophoneEnabled ? "text-[#e74c3c]" : "text-white"
+              }`}
             >
-              <Mic className="w-4 h-4 lk-on" />
-              <MicOff className="w-4 h-4 lk-off" />
-            </TrackToggle>
+              {localParticipant.isMicrophoneEnabled ? <Mic className="w-4.5 h-4.5" /> : <MicOff className="w-4.5 h-4.5" />}
+            </button>
             <MediaDeviceMenu kind="audioinput">
-              <div className="px-1.5 py-1.5 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
-                <ChevronDown className="w-3.5 h-3.5" />
+              <div className="px-2 py-2 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
+                <ChevronDown className="w-4 h-4" />
               </div>
             </MediaDeviceMenu>
           </div>
 
           {/* Cámara */}
-          <div className="flex items-center rounded-lg bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-sm shadow-black/20">
-            <TrackToggle
-              source={Track.Source.Camera}
-              className="px-3 py-1.5 flex items-center justify-center hover:bg-white/10 transition-colors border-r border-white/10 text-white data-[lk-enabled=false]:text-[#e74c3c]"
+          <div className="flex items-center rounded-xl bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-lg">
+            <button
+              onClick={() => localParticipant.setCameraEnabled(!localParticipant.isCameraEnabled)}
+              title={localParticipant.isCameraEnabled ? "Detener video" : "Activar cámara"}
+              className={`px-4 py-2 flex items-center justify-center hover:bg-white/10 transition-all border-r border-white/10 ${
+                !localParticipant.isCameraEnabled ? "text-[#e74c3c]" : "text-white"
+              }`}
             >
-              <Video className="w-4 h-4 lk-on" />
-              <VideoOff className="w-4 h-4 lk-off" />
-            </TrackToggle>
+              {localParticipant.isCameraEnabled ? <Video className="w-4.5 h-4.5" /> : <VideoOff className="w-4.5 h-4.5" />}
+            </button>
             <MediaDeviceMenu kind="videoinput">
-              <div className="px-1.5 py-1.5 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
-                <ChevronDown className="w-3.5 h-3.5" />
+              <div className="px-2 py-2 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
+                <ChevronDown className="w-4 h-4" />
               </div>
             </MediaDeviceMenu>
           </div>
 
           {/* Compartir Pantalla */}
-          <TrackToggle
-            source={Track.Source.ScreenShare}
-            className="px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 hover:bg-[#383838] transition-all text-white data-[lk-enabled=true]:bg-[#00a0d1]/20 data-[lk-enabled=true]:border-[#00a0d1] data-[lk-enabled=true]:text-[#00a0d1] flex items-center gap-2"
+          <button
+            onClick={() => localParticipant.setScreenShareEnabled(!localParticipant.isScreenShareEnabled)}
+            title="Compartir pantalla"
+            className={`p-2.5 rounded-xl border transition-all flex items-center gap-2 shadow-lg ${
+              localParticipant.isScreenShareEnabled
+                ? "bg-[#00a0d1]/20 border-[#00a0d1] text-[#00a0d1]"
+                : "bg-[#2d2d2d] border-white/10 text-white hover:bg-[#383838]"
+            }`}
           >
-            <Monitor className="w-4 h-4 lk-off" />
-            <MonitorOff className="w-4 h-4 lk-on" />
-            <span className="text-xs font-medium hidden sm:inline">Presentar</span>
-          </TrackToggle>
+            {localParticipant.isScreenShareEnabled ? <MonitorOff className="w-4.5 h-4.5" /> : <Monitor className="w-4.5 h-4.5" />}
+            <span className="text-xs font-bold hidden md:inline">Presentar</span>
+          </button>
+
           {/* Chat */}
           <button
-            onClick={() => {
-              setShowChat(!showChat);
-              setShowMore(false);
-              setShowReactions(false);
-            }}
+            onClick={() => { setShowChat(!showChat); setShowMore(false); setShowReactions(false); }}
             title="Chat"
-            className={`px-2 py-1.5 rounded-lg border text-base transition-all ${
+            className={`p-2.5 rounded-xl border transition-all shadow-lg ${
               showChat
                 ? "bg-[#00a0d1]/20 border-[#00a0d1] text-[#00a0d1]"
                 : "bg-[#2d2d2d] border-white/10 text-white hover:bg-[#383838]"
             }`}
           >
-            💬
+            <MessageSquare className="w-5 h-5" />
           </button>
-          {/* Levantar mano */}
-          <button
-            onClick={toggleHand}
-            title={handRaised ? "Bajar la mano" : "Levantar mano"}
-            className={`px-2 py-1.5 rounded-lg border text-base transition-all ${
-              handRaised
-                ? "bg-[#00a0d1]/20 border-[#00a0d1] text-[#00a0d1] scale-110"
-                : "bg-[#2d2d2d] border-white/10 text-white hover:bg-[#383838]"
-            }`}
-          >
-            ✋
-          </button>
-          {/* Reacciones */}
-          <button
-            onClick={() => {
-              setShowReactions(!showReactions);
-              setShowMore(false);
-            }}
-            title="Reacciones"
-            className="px-2 py-1.5 rounded-lg bg-[#2d2d2d] hover:bg-[#383838] text-white border border-white/10 text-base"
-          >
-            😊
-          </button>
-          {/* Más opciones */}
-          <button
-            onClick={() => {
-              setShowMore(!showMore);
-              setShowReactions(false);
-            }}
-            title="Más opciones"
-            className="px-2 py-1.5 rounded-lg bg-[#2d2d2d] hover:bg-[#383838] text-[#b3b3b3] border border-white/10"
-          >
-            ···
-          </button>
+
+          {/* Reacciones y otros agrupados */}
+          <div className="hidden sm:flex items-center gap-3 px-3 py-1 bg-white/5 rounded-2xl border border-white/5">
+            <button
+              onClick={toggleHand}
+              title={handRaised ? "Bajar mano" : "Levantar mano"}
+              className={`p-1.5 transition-all ${handRaised ? "text-[#f39c12] scale-125" : "text-[#b3b3b3] hover:text-white"}`}
+            >
+              <Hand className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => { setShowReactions(!showReactions); setShowMore(false); }}
+              title="Reacciones"
+              className="p-1.5 text-[#b3b3b3] hover:text-white transition-all"
+            >
+              <Smile className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => { setShowMore(!showMore); setShowReactions(false); }}
+              title="Más opciones"
+              className="p-1.5 text-[#b3b3b3] hover:text-white transition-all"
+            >
+              <MoreHorizontal className="w-5 h-5" />
+            </button>
+          </div>
+
           {/* Salir */}
           <button
             onClick={onLeave}
-            title="Salir de la reunión"
-            className="w-9 h-9 rounded-full bg-[#e74c3c] hover:bg-[#c0392b] flex items-center justify-center transition-colors"
+            title="Finalizar"
+            className="w-11 h-11 rounded-2xl bg-[#e74c3c] hover:bg-[#c0392b] flex items-center justify-center transition-all shadow-lg shadow-red-900/20 active:scale-95 ml-2"
           >
-            <X className="w-4 h-4 text-white" />
+            <X className="w-5 h-5 text-white" />
           </button>
         </div>
 
-        {/* Derecha */}
-        <div className="flex items-center gap-1">
+        {/* Derecha: Layout e Info */}
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => {
-              setShowDesign(!showDesign);
-              setShowInvite(false);
-            }}
-            title="Diseño"
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-              showDesign
-                ? "bg-white/20 text-white"
-                : "hover:bg-white/10 text-[#b3b3b3]"
+            onClick={() => setShowDesign(!showDesign)}
+            className={`p-2 rounded-xl border transition-all ${
+              showDesign ? "bg-white/10 border-white/20 text-white" : "border-transparent text-[#6e6e6e] hover:text-white"
             }`}
           >
-            <Grid3x3 className="w-4 h-4" />
+            <LayoutGrid className="w-5 h-5" />
           </button>
           <button
-            onClick={() => {
-              setShowInvite(!showInvite);
-              setShowDesign(false);
-            }}
-            title="Participantes"
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-              showInvite
-                ? "bg-white/20 text-white"
-                : "hover:bg-white/10 text-[#b3b3b3]"
+            onClick={() => setShowInvite(!showInvite)}
+            className={`p-2 rounded-xl border transition-all ${
+              showInvite ? "bg-white/10 border-white/20 text-white" : "border-transparent text-[#6e6e6e] hover:text-white"
             }`}
           >
-            <Users className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => {
-              setShowInvite(!showInvite);
-              setShowDesign(false);
-            }}
-            title="Invitar"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs hover:bg-white/10 text-[#b3b3b3] transition-colors"
-          >
-            <MessageSquareWarning className="w-4 h-4" />
+            <Users className="w-5 h-5" />
           </button>
         </div>
+      </div>
       </div>
     </>
   );
