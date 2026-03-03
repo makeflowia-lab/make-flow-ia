@@ -620,8 +620,6 @@ function MeetingControlBar({
       )}
 
       {/* Barra de control inferior */}
-      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-2.5 bg-[#1a1a1a]/95 border-t border-white/10 backdrop-blur-sm z-10">
-      {/* Barra de control inferior */}
       <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-[#1a1a1a]/95 border-t border-white/10 backdrop-blur-md z-10">
         {/* Izquierda: Info de la Reunión */}
         <div className="flex items-center gap-4">
@@ -750,7 +748,6 @@ function MeetingControlBar({
             <Users className="w-5 h-5" />
           </button>
         </div>
-      </div>
       </div>
     </>
   );
