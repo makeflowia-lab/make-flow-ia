@@ -14,6 +14,8 @@ import {
   useLocalParticipant,
   useParticipants,
   useChat,
+  TrackToggle,
+  MediaDeviceMenu,
 } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import {
@@ -34,6 +36,13 @@ import {
   MessageSquareWarning,
   Settings2,
   LogOut,
+  Mic,
+  MicOff,
+  Video,
+  VideoOff,
+  ChevronDown,
+  Monitor,
+  MonitorOff,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/Button";
 import type { LayoutMode } from "../types";
@@ -507,17 +516,6 @@ function MeetingControlBar({
   const [handRaised, setHandRaised] = useState(false);
   const [floatingEmojis, setFloatingEmojis] = useState<ActiveEmoji[]>([]);
 
-  const { localParticipant } = useLocalParticipant();
-
-  const { send } = useDataChannel("reactions", (msg) => {
-    try {
-      const { emoji } = JSON.parse(new TextDecoder().decode(msg.payload));
-      addFloatingEmoji(emoji);
-    } catch {
-      // mensaje malformado, ignorar
-    }
-  });
-
   function addFloatingEmoji(emoji: string) {
     const id = Math.random().toString(36).slice(2);
     const x = 8 + Math.random() * 78;
@@ -527,6 +525,15 @@ function MeetingControlBar({
       2400,
     );
   }
+
+  const { send } = useDataChannel("reactions", (msg) => {
+    try {
+      const { emoji } = JSON.parse(new TextDecoder().decode(msg.payload));
+      addFloatingEmoji(emoji);
+    } catch {
+      // mensaje malformado, ignorar
+    }
+  });
 
   function sendReaction(emoji: string) {
     try {
@@ -619,17 +626,49 @@ function MeetingControlBar({
           </button>
         </div>
 
-        {/* Centro */}
+        {/* Centro (Controles Principales) */}
         <div className="flex items-center gap-2">
-          <ControlBar
-            controls={{
-              microphone: true,
-              camera: true,
-              screenShare: true,
-              chat: false,
-              leave: false,
-            }}
-          />
+          {/* Micrófono */}
+          <div className="flex items-center rounded-lg bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-sm shadow-black/20">
+            <TrackToggle
+              source={Track.Source.Microphone}
+              className="px-3 py-1.5 flex items-center justify-center hover:bg-white/10 transition-colors border-r border-white/10 text-white data-[lk-enabled=false]:text-[#e74c3c]"
+            >
+              <Mic className="w-4 h-4 lk-on" />
+              <MicOff className="w-4 h-4 lk-off" />
+            </TrackToggle>
+            <MediaDeviceMenu kind="audioinput">
+              <button className="px-1.5 py-1.5 hover:bg-white/10 transition-colors text-[#b3b3b3]">
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+            </MediaDeviceMenu>
+          </div>
+
+          {/* Cámara */}
+          <div className="flex items-center rounded-lg bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-sm shadow-black/20">
+            <TrackToggle
+              source={Track.Source.Camera}
+              className="px-3 py-1.5 flex items-center justify-center hover:bg-white/10 transition-colors border-r border-white/10 text-white data-[lk-enabled=false]:text-[#e74c3c]"
+            >
+              <Video className="w-4 h-4 lk-on" />
+              <VideoOff className="w-4 h-4 lk-off" />
+            </TrackToggle>
+            <MediaDeviceMenu kind="videoinput">
+              <button className="px-1.5 py-1.5 hover:bg-white/10 transition-colors text-[#b3b3b3]">
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+            </MediaDeviceMenu>
+          </div>
+
+          {/* Compartir Pantalla */}
+          <TrackToggle
+            source={Track.Source.ScreenShare}
+            className="px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 hover:bg-[#383838] transition-all text-white data-[lk-enabled=true]:bg-[#00a0d1]/20 data-[lk-enabled=true]:border-[#00a0d1] data-[lk-enabled=true]:text-[#00a0d1] flex items-center gap-2"
+          >
+            <Monitor className="w-4 h-4 lk-off" />
+            <MonitorOff className="w-4 h-4 lk-on" />
+            <span className="text-xs font-medium hidden sm:inline">Presentar</span>
+          </TrackToggle>
           {/* Chat */}
           <button
             onClick={() => {
@@ -746,10 +785,14 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  function handleSend() {
+  async function handleSend() {
     if (!message.trim() || isSending) return;
-    send(message.trim());
-    setMessage("");
+    try {
+      await send(message.trim());
+      setMessage("");
+    } catch (error) {
+      console.error("Chat send error:", error);
+    }
   }
 
   return (
