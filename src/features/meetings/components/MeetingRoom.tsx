@@ -546,6 +546,8 @@ function MeetingControlBar({
     addFloatingEmoji(emoji);
   }
 
+  const { localParticipant } = useLocalParticipant();
+
   function toggleHand() {
     const next = !handRaised;
     setHandRaised(next);
