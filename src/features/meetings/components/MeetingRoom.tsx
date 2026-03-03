@@ -1005,13 +1005,9 @@ export function MeetingRoom({
   }, []);
 
   const handleDisconnect = useCallback(() => {
-    console.log("MeetingRoom: onDisconnected called - NOT REDIRECTING AUTOMATICALLY FOR DEBUG");
-    // router.push("/dashboard");
-  }, []);
-
-  const handleConnectError = (error: Error) => {
-    console.error("MeetingRoom: Connection error:", error);
-  };
+    console.log("MeetingRoom: onDisconnected called");
+    router.push("/dashboard");
+  }, [router]);
 
   function copyMeetingLink() {
     const url = `${window.location.origin}/meetings/${meetingId}`;
@@ -1026,7 +1022,6 @@ export function MeetingRoom({
         token={token}
         serverUrl={serverUrl}
         onDisconnected={handleDisconnect}
-        onConnectError={handleConnectError}
         data-lk-theme="default"
         className="flex-1 flex flex-col relative"
         style={{ height: "100vh" }}
