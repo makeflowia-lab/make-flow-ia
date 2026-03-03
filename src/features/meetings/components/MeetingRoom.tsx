@@ -640,9 +640,9 @@ function MeetingControlBar({
               <MicOff className="w-4 h-4 lk-off" />
             </TrackToggle>
             <MediaDeviceMenu kind="audioinput">
-              <button className="px-1.5 py-1.5 hover:bg-white/10 transition-colors text-[#b3b3b3]">
+              <div className="px-1.5 py-1.5 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
                 <ChevronDown className="w-3.5 h-3.5" />
-              </button>
+              </div>
             </MediaDeviceMenu>
           </div>
 
@@ -656,9 +656,9 @@ function MeetingControlBar({
               <VideoOff className="w-4 h-4 lk-off" />
             </TrackToggle>
             <MediaDeviceMenu kind="videoinput">
-              <button className="px-1.5 py-1.5 hover:bg-white/10 transition-colors text-[#b3b3b3]">
+              <div className="px-1.5 py-1.5 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
                 <ChevronDown className="w-3.5 h-3.5" />
-              </button>
+              </div>
             </MediaDeviceMenu>
           </div>
 
