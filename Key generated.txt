@@ -1,0 +1,17 @@
+Key generated
+You may now use these secrets in your application.
+
+Websocket URL
+wss://video-saas-c8qg6qfp.livekit.cloud
+
+API key
+APILeaHhJue9gah
+
+API secret
+0svWwKiVpN4EMTlkXnEWLrxleWzcki9pihpG0FvZ9GL
+
+Environment variables
+LIVEKIT_URL=wss://video-saas-c8qg6qfp.livekit.cloud
+LIVEKIT_API_KEY=APILeaHhJue9gah
+LIVEKIT_API_SECRET=0svWwKiVpN4EMTlkXnEWLrxleWzcki9pihpG0FvZ9GL
+

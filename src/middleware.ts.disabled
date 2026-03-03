@@ -1,0 +1,2 @@
+// Este archivo está desactivado. La lógica de autenticación está en proxy.ts (root)
+// Next.js 16 usa proxy.ts en lugar de middleware.ts
