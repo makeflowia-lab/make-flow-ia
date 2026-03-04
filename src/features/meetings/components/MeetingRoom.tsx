@@ -13,8 +13,9 @@ import {
   useLocalParticipant,
   useParticipants,
   useChat,
+  useConnectionState,
 } from "@livekit/components-react";
-import { Track } from "livekit-client";
+import { Track, ConnectionState } from "livekit-client";
 import {
   ChevronLeft,
   LayoutGrid,
@@ -901,6 +902,33 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ─── Banner de estado de conexión ─────────────────────────────────────────────
+function ConnectionStatusBanner() {
+  const connectionState = useConnectionState();
+
+  if (connectionState === ConnectionState.Connected) return null;
+
+  const labels: Record<string, { text: string; color: string }> = {
+    [ConnectionState.Connecting]: { text: "Conectando a la sala…", color: "#f39c12" },
+    [ConnectionState.Reconnecting]: { text: "Reconectando…", color: "#f39c12" },
+    [ConnectionState.Disconnected]: { text: "Desconectado de la sala", color: "#e74c3c" },
+  };
+
+  const info = labels[connectionState] || { text: `Estado: ${connectionState}`, color: "#6e6e6e" };
+
+  return (
+    <div
+      className="absolute top-12 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-lg border animate-fade-in"
+      style={{ backgroundColor: `${info.color}20`, borderColor: `${info.color}50`, color: info.color }}
+    >
+      <div className="flex items-center gap-2">
+        <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: info.color }} />
+        <span className="text-sm font-medium">{info.text}</span>
+      </div>
+    </div>
+  );
+}
+
 // ─── Grid de video con soporte de layouts ─────────────────────────────────────
 function VideoGrid({
   layout,
@@ -909,6 +937,7 @@ function VideoGrid({
   layout: LayoutMode;
   hideNames: boolean;
 }) {
+  const connectionState = useConnectionState();
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -918,6 +947,24 @@ function VideoGrid({
   );
 
   const hideClass = hideNames ? "lk-hide-names" : "";
+
+  // Mostrar mensaje cuando no hay tracks
+  if (tracks.length === 0) {
+    return (
+      <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center" }}>
+          {connectionState !== ConnectionState.Connected ? (
+            <>
+              <div className="w-10 h-10 border-2 border-[#00a0d1] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <p style={{ color: "#b3b3b3", fontSize: 14 }}>Conectando a la sala…</p>
+            </>
+          ) : (
+            <p style={{ color: "#6e6e6e", fontSize: 14 }}>Esperando participantes…</p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (layout === "grouped") {
     const [main, ...rest] = tracks;
@@ -1065,7 +1112,9 @@ export function MeetingRoom({
         token={token}
         serverUrl={serverUrl}
         connect={true}
+        onConnected={() => console.log("LiveKitRoom: CONNECTED to room")}
         onDisconnected={handleDisconnect}
+        onError={(err) => console.error("LiveKitRoom: CONNECTION ERROR", err)}
         data-lk-theme="default"
         className="flex-1 flex flex-col relative"
         style={{ height: "100vh" }}
@@ -1123,6 +1172,9 @@ export function MeetingRoom({
               </button>
             </div>
           </div>
+
+          {/* Estado de conexión */}
+          <ConnectionStatusBanner />
 
           {/* Área de video + panel de chat */}
           <div className="flex-1 pt-11 pb-[80px] flex overflow-hidden">
