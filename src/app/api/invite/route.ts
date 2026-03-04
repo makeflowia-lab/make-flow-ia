@@ -11,6 +11,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     }
 
+    console.log("Invite API: Sending email to", email, "with key:", process.env.RESEND_API_KEY?.substring(0, 8) + "...");
+
     const { data, error } = await resend.emails.send({
       from: "Make Flow IA <onboarding@resend.dev>",
       to: [email],
@@ -42,10 +44,11 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
-      console.error("Resend error:", error);
-      return NextResponse.json({ error: "Error enviando email" }, { status: 500 });
+      console.error("Resend error:", JSON.stringify(error));
+      return NextResponse.json({ error: error.message || "Error enviando email" }, { status: 500 });
     }
 
+    console.log("Invite API: Email sent successfully, id:", data?.id);
     return NextResponse.json({ data: { id: data?.id } });
   } catch (error) {
     console.error("Email API error:", error);

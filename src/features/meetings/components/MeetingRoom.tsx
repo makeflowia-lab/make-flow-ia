@@ -188,7 +188,7 @@ function InvitePanel({
     setSending(true);
     setErrorMsg("");
     try {
-      const res = await fetch("/api/meetings/invite", {
+      const res = await fetch("/api/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
