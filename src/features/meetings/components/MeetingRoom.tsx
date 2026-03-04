@@ -640,7 +640,7 @@ function MeetingControlBar({
                 !localParticipant.isMicrophoneEnabled ? "text-[#e74c3c]" : "text-white"
               }`}
             >
-              {localParticipant.isMicrophoneEnabled ? <Mic className="w-4.5 h-4.5" /> : <MicOff className="w-4.5 h-4.5" />}
+              {localParticipant.isMicrophoneEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
             </button>
             <MediaDeviceMenu kind="audioinput">
               <div className="px-2 py-2 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
@@ -658,7 +658,7 @@ function MeetingControlBar({
                 !localParticipant.isCameraEnabled ? "text-[#e74c3c]" : "text-white"
               }`}
             >
-              {localParticipant.isCameraEnabled ? <Video className="w-4.5 h-4.5" /> : <VideoOff className="w-4.5 h-4.5" />}
+              {localParticipant.isCameraEnabled ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
             </button>
             <MediaDeviceMenu kind="videoinput">
               <div className="px-2 py-2 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
@@ -677,7 +677,7 @@ function MeetingControlBar({
                 : "bg-[#2d2d2d] border-white/10 text-white hover:bg-[#383838]"
             }`}
           >
-            {localParticipant.isScreenShareEnabled ? <MonitorOff className="w-4.5 h-4.5" /> : <Monitor className="w-4.5 h-4.5" />}
+            {localParticipant.isScreenShareEnabled ? <MonitorOff className="w-5 h-5" /> : <Monitor className="w-5 h-5" />}
             <span className="text-xs font-bold hidden md:inline">Presentar</span>
           </button>
 
@@ -843,7 +843,7 @@ function VideoGrid({
 }) {
   const tracks = useTracks(
     [
-      { source: Track.Source.Camera, withPlaceholder: true },
+      { source: Track.Source.Camera, withPlaceholder: false },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
     { onlySubscribed: false },
