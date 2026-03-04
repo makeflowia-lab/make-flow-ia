@@ -8,14 +8,11 @@ import {
   RoomAudioRenderer,
   GridLayout,
   ParticipantTile,
-  ControlBar,
   useTracks,
   useDataChannel,
   useLocalParticipant,
   useParticipants,
   useChat,
-  TrackToggle,
-  MediaDeviceMenu,
 } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import {
@@ -519,6 +516,25 @@ function MeetingControlBar({
   const [showSubtitles, setShowSubtitles] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
   const [floatingEmojis, setFloatingEmojis] = useState<ActiveEmoji[]>([]);
+  const [showMicMenu, setShowMicMenu] = useState(false);
+  const [showCamMenu, setShowCamMenu] = useState(false);
+  const [devices, setDevices] = useState<{ mics: MediaDeviceInfo[]; cameras: MediaDeviceInfo[] }>({ mics: [], cameras: [] });
+
+  // Enumerar dispositivos al montar
+  useEffect(() => {
+    async function loadDevices() {
+      try {
+        const all = await navigator.mediaDevices.enumerateDevices();
+        setDevices({
+          mics: all.filter((d) => d.kind === "audioinput"),
+          cameras: all.filter((d) => d.kind === "videoinput"),
+        });
+      } catch { /* sin permisos */ }
+    }
+    loadDevices();
+    navigator.mediaDevices.addEventListener("devicechange", loadDevices);
+    return () => navigator.mediaDevices.removeEventListener("devicechange", loadDevices);
+  }, []);
 
   function addFloatingEmoji(emoji: string) {
     const id = Math.random().toString(36).slice(2);
@@ -560,6 +576,20 @@ function MeetingControlBar({
     } catch {
       // sin conexión aún, ignorar
     }
+  }
+
+  async function switchMic(deviceId: string) {
+    try {
+      await localParticipant.setMicrophoneEnabled(true, { deviceId: { exact: deviceId } });
+    } catch { /* dispositivo no disponible */ }
+    setShowMicMenu(false);
+  }
+
+  async function switchCam(deviceId: string) {
+    try {
+      await localParticipant.setCameraEnabled(true, { deviceId: { exact: deviceId } });
+    } catch { /* dispositivo no disponible */ }
+    setShowCamMenu(false);
   }
 
   return (
@@ -629,42 +659,80 @@ function MeetingControlBar({
           </div>
         </div>
 
-        {/* Centro: Controles Principales Simplificados */}
+        {/* Centro: Controles Principales */}
         <div className="flex items-center gap-3">
-          {/* Micrófono */}
-          <div className="flex items-center rounded-xl bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-lg">
-            <button
-              onClick={() => localParticipant.setMicrophoneEnabled(!localParticipant.isMicrophoneEnabled)}
-              title={localParticipant.isMicrophoneEnabled ? "Silenciar" : "Activar micrófono"}
-              className={`px-4 py-2 flex items-center justify-center hover:bg-white/10 transition-all border-r border-white/10 ${
-                !localParticipant.isMicrophoneEnabled ? "text-[#e74c3c]" : "text-white"
-              }`}
-            >
-              {localParticipant.isMicrophoneEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
-            </button>
-            <MediaDeviceMenu kind="audioinput">
-              <div className="px-2 py-2 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
+          {/* Micrófono con selector de dispositivo custom */}
+          <div className="relative">
+            <div className="flex items-center rounded-xl bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-lg">
+              <button
+                onClick={() => localParticipant.setMicrophoneEnabled(!localParticipant.isMicrophoneEnabled)}
+                title={localParticipant.isMicrophoneEnabled ? "Silenciar" : "Activar micrófono"}
+                className={`px-4 py-2 flex items-center justify-center hover:bg-white/10 transition-all border-r border-white/10 ${
+                  !localParticipant.isMicrophoneEnabled ? "text-[#e74c3c]" : "text-white"
+                }`}
+              >
+                {localParticipant.isMicrophoneEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+              </button>
+              <button
+                onClick={() => { setShowMicMenu(!showMicMenu); setShowCamMenu(false); }}
+                className="px-2 py-2 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer"
+                title="Seleccionar micrófono"
+              >
                 <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
+            {showMicMenu && devices.mics.length > 0 && (
+              <div className="absolute bottom-12 left-0 z-50 bg-[#2d2d2d] border border-white/10 rounded-xl shadow-2xl py-1 min-w-[260px] animate-fade-in">
+                <p className="px-3 py-1.5 text-xs font-semibold text-[#6e6e6e] uppercase tracking-wider">Micrófono</p>
+                {devices.mics.map((mic) => (
+                  <button
+                    key={mic.deviceId}
+                    onClick={() => switchMic(mic.deviceId)}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors hover:bg-white/10 text-white"
+                  >
+                    <Mic className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span className="truncate">{mic.label || `Micrófono ${mic.deviceId.slice(0, 6)}`}</span>
+                  </button>
+                ))}
               </div>
-            </MediaDeviceMenu>
+            )}
           </div>
 
-          {/* Cámara */}
-          <div className="flex items-center rounded-xl bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-lg">
-            <button
-              onClick={() => localParticipant.setCameraEnabled(!localParticipant.isCameraEnabled)}
-              title={localParticipant.isCameraEnabled ? "Detener video" : "Activar cámara"}
-              className={`px-4 py-2 flex items-center justify-center hover:bg-white/10 transition-all border-r border-white/10 ${
-                !localParticipant.isCameraEnabled ? "text-[#e74c3c]" : "text-white"
-              }`}
-            >
-              {localParticipant.isCameraEnabled ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
-            </button>
-            <MediaDeviceMenu kind="videoinput">
-              <div className="px-2 py-2 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer">
+          {/* Cámara con selector de dispositivo custom */}
+          <div className="relative">
+            <div className="flex items-center rounded-xl bg-[#2d2d2d] border border-white/10 overflow-hidden shadow-lg">
+              <button
+                onClick={() => localParticipant.setCameraEnabled(!localParticipant.isCameraEnabled)}
+                title={localParticipant.isCameraEnabled ? "Detener video" : "Activar cámara"}
+                className={`px-4 py-2 flex items-center justify-center hover:bg-white/10 transition-all border-r border-white/10 ${
+                  !localParticipant.isCameraEnabled ? "text-[#e74c3c]" : "text-white"
+                }`}
+              >
+                {localParticipant.isCameraEnabled ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+              </button>
+              <button
+                onClick={() => { setShowCamMenu(!showCamMenu); setShowMicMenu(false); }}
+                className="px-2 py-2 hover:bg-white/10 transition-colors text-[#b3b3b3] cursor-pointer"
+                title="Seleccionar cámara"
+              >
                 <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
+            {showCamMenu && devices.cameras.length > 0 && (
+              <div className="absolute bottom-12 left-0 z-50 bg-[#2d2d2d] border border-white/10 rounded-xl shadow-2xl py-1 min-w-[260px] animate-fade-in">
+                <p className="px-3 py-1.5 text-xs font-semibold text-[#6e6e6e] uppercase tracking-wider">Cámara</p>
+                {devices.cameras.map((cam) => (
+                  <button
+                    key={cam.deviceId}
+                    onClick={() => switchCam(cam.deviceId)}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors hover:bg-white/10 text-white"
+                  >
+                    <Video className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span className="truncate">{cam.label || `Cámara ${cam.deviceId.slice(0, 6)}`}</span>
+                  </button>
+                ))}
               </div>
-            </MediaDeviceMenu>
+            )}
           </div>
 
           {/* Compartir Pantalla */}
@@ -843,26 +911,24 @@ function VideoGrid({
 }) {
   const tracks = useTracks(
     [
-      { source: Track.Source.Camera, withPlaceholder: false },
+      { source: Track.Source.Camera, withPlaceholder: true },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
     { onlySubscribed: false },
   );
 
-  const nameStyle: React.CSSProperties = hideNames
-    ? ({ "--lk-participant-name-display": "none" } as React.CSSProperties)
-    : {};
+  const hideClass = hideNames ? "lk-hide-names" : "";
 
   if (layout === "grouped") {
     const [main, ...rest] = tracks;
     return (
       <div
+        className={hideClass}
         style={{
           display: "flex",
           height: "100%",
           gap: 8,
           padding: 8,
-          ...nameStyle,
         }}
       >
         <div
@@ -917,13 +983,13 @@ function VideoGrid({
   if (layout === "side-by-side") {
     return (
       <div
+        className={hideClass}
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           height: "100%",
           gap: 8,
           padding: 8,
-          ...nameStyle,
         }}
       >
         {tracks.map((t) => (
@@ -939,7 +1005,7 @@ function VideoGrid({
 
   // Modo grid (default)
   return (
-    <div style={{ height: "100%", width: "100%", ...nameStyle }}>
+    <div className={hideClass} style={{ height: "100%", width: "100%" }}>
       <GridLayout tracks={tracks} style={{ height: "100%", width: "100%" }}>
         <ParticipantTile />
       </GridLayout>

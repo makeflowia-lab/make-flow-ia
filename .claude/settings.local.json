@@ -26,7 +26,8 @@
       "Bash(__NEW_LINE_c79184fe4f6cd924__ curl:*)",
       "Bash(__NEW_LINE_9a12ab34051e3e83__ curl:*)",
       "Bash(__NEW_LINE_35d80552fb51701d__ curl:*)",
-      "Bash(__NEW_LINE_e4e07110b03cbebe__ curl:*)"
+      "Bash(__NEW_LINE_e4e07110b03cbebe__ curl:*)",
+      "WebFetch(domain:webex-gamma.vercel.app)"
     ]
   }
 }

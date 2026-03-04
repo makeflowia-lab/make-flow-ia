@@ -1,0 +1,39 @@
+
+> webex@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 59s
+  Running TypeScript ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/12) ...
+  Generating static pages using 3 workers (3/12) 
+  Generating static pages using 3 workers (6/12) 
+  Generating static pages using 3 workers (9/12) 
+Ô£ô Generating static pages using 3 workers (12/12) in 845.5ms
+  Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ ãÆ /api/auth/login
+Ôö£ ãÆ /api/auth/logout
+Ôö£ ãÆ /api/auth/me
+Ôö£ ãÆ /api/auth/register
+Ôö£ ãÆ /api/meetings
+Ôö£ ãÆ /api/meetings/[id]
+Ôö£ ãÆ /api/meetings/[id]/token
+Ôö£ Ôùï /dashboard
+Ôö£ Ôùï /login
+Ôö£ ãÆ /meetings/[id]
+Ôöö Ôùï /register
+
+
+ãÆ Proxy (Middleware)
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+
