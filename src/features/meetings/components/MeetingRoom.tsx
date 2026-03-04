@@ -198,16 +198,22 @@ function InvitePanel({
           senderName: "Un participante",
         }),
       });
+      // Leer respuesta como texto primero (en caso de que no sea JSON)
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch { data = null; }
+
       if (!res.ok) {
-        const data = await res.json();
-        setErrorMsg(data.error || "Error al enviar");
+        console.error("Invite API error:", res.status, text);
+        setErrorMsg(data?.error || `Error del servidor (${res.status})`);
       } else {
         setSent(true);
         setEmail("");
         setTimeout(() => setSent(false), 3000);
       }
-    } catch {
-      setErrorMsg("Error de red al enviar");
+    } catch (err) {
+      console.error("Invite fetch error:", err);
+      setErrorMsg(`Error de conexión: ${err instanceof Error ? err.message : "desconocido"}`);
     } finally {
       setSending(false);
     }
