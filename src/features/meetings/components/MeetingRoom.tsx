@@ -170,6 +170,8 @@ function InvitePanel({
   const [email, setEmail] = useState("");
   const [copied, setCopied] = useState(false);
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const meetingUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/meetings/${meetingId}`
@@ -181,22 +183,34 @@ function InvitePanel({
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function sendInvite() {
-    if (!email.trim()) return;
-    const subject = encodeURIComponent(`Te invito a unirte a: ${meetingTitle}`);
-    const body = encodeURIComponent(
-      `Hola,\n\nTe invito a unirte a la reunión "${meetingTitle}" en Make Flow IA.\n\n` +
-        `📅 Únete ahora:\n${meetingUrl}\n\n` +
-        `O copia este enlace en tu navegador:\n${meetingUrl}\n\n` +
-        `Te esperamos.\n\nMake Flow IA`,
-    );
-    window.open(
-      `mailto:${email.trim()}?subject=${subject}&body=${body}`,
-      "_blank",
-    );
-    setSent(true);
-    setEmail("");
-    setTimeout(() => setSent(false), 3000);
+  async function sendInvite() {
+    if (!email.trim() || sending) return;
+    setSending(true);
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/meetings/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          meetingTitle,
+          meetingUrl,
+          senderName: "Un participante",
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorMsg(data.error || "Error al enviar");
+      } else {
+        setSent(true);
+        setEmail("");
+        setTimeout(() => setSent(false), 3000);
+      }
+    } catch {
+      setErrorMsg("Error de red al enviar");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -215,6 +229,11 @@ function InvitePanel({
             ✓ Invitación enviada correctamente
           </div>
         )}
+        {errorMsg && (
+          <div className="px-3 py-2 bg-red-500/15 border border-red-500/30 rounded-lg text-sm text-red-400">
+            {errorMsg}
+          </div>
+        )}
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -226,10 +245,10 @@ function InvitePanel({
         <Button
           variant="secondary"
           className="w-full"
-          disabled={!email.trim()}
+          disabled={!email.trim() || sending}
           onClick={sendInvite}
         >
-          Invitar
+          {sending ? "Enviando…" : "Invitar"}
         </Button>
         <div className="pt-2 border-t border-white/10 space-y-1">
           <p className="text-xs text-[#6e6e6e] px-1">

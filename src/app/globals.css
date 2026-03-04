@@ -82,8 +82,13 @@ body {
 
 /* Ocultar nombres cuando hideNames está activo */
 .lk-hide-names .lk-participant-name,
-.lk-hide-names .lk-participant-metadata {
+.lk-hide-names .lk-participant-metadata,
+.lk-hide-names .lk-participant-metadata-item,
+.lk-hide-names .lk-participant-tile [class*="participant-name"],
+.lk-hide-names .lk-participant-tile [class*="display-name"],
+.lk-hide-names .lk-participant-tile .lk-participant-info-bar {
   display: none !important;
+  visibility: hidden !important;
 }
 
 .lk-grid-layout {
