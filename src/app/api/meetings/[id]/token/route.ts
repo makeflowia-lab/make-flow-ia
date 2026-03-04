@@ -3,6 +3,8 @@ import { verifyToken } from "@/shared/lib/jwt";
 import { sql } from "@/shared/lib/db";
 import { generateRoomToken } from "@/shared/lib/livekit";
 
+const LIVEKIT_URL = process.env.NEXT_PUBLIC_LIVEKIT_URL || process.env.LIVEKIT_URL || "wss://video-saas-c8qg6qfp.livekit.cloud";
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authToken = req.cookies.get("auth_token")?.value;
@@ -74,7 +76,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({
       data: {
         token: livekitToken,
-        serverUrl: process.env.NEXT_PUBLIC_LIVEKIT_URL,
+        serverUrl: LIVEKIT_URL,
         roomName: meeting.room_name,
         isHost,
       },

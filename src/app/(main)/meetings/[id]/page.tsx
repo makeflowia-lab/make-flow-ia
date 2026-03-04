@@ -13,6 +13,8 @@ interface RoomCredentials {
   serverUrl: string;
 }
 
+const LIVEKIT_URL_FALLBACK = "wss://video-saas-c8qg6qfp.livekit.cloud";
+
 export default function MeetingPage() {
   const params = useParams();
   const router = useRouter();
@@ -70,7 +72,7 @@ export default function MeetingPage() {
       console.log("MeetingPage: Token received", data.data);
       setCredentials({
         token: data.data.token,
-        serverUrl: data.data.serverUrl,
+        serverUrl: data.data.serverUrl || LIVEKIT_URL_FALLBACK,
       });
       console.log("MeetingPage: Switching to stage 'room'");
       setStage("room");
@@ -124,8 +126,7 @@ export default function MeetingPage() {
 
   if (stage === "room" && credentials && meeting) {
     console.log("MeetingPage: Rendering MeetingRoom stage");
-    const serverUrl =
-      credentials.serverUrl || process.env.NEXT_PUBLIC_LIVEKIT_URL || "";
+    const serverUrl = credentials.serverUrl || LIVEKIT_URL_FALLBACK;
     console.log("MeetingPage: room details", {
       serverUrl,
       meetingId,
